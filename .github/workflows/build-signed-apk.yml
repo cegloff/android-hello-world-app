@@ -17,6 +17,14 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        sdk-version: '34'
+        build-tools-version: '34.0.0'
+        platform-tools-version: '34.0.5'
+        ndk-version: '25.1.8937393'
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
@@ -42,13 +50,13 @@ jobs:
     - name: Sign APK with self-signed certificate
       run: |
         # Align the APK first
-        zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk app-release-aligned.apk
+        $ANDROID_HOME/build-tools/34.0.0/zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk app-release-aligned.apk
         
         # Sign the aligned APK
-        apksigner sign --ks my-release-key.jks --ks-pass pass:password123 --key-pass pass:password123 --out app-release-signed.apk app-release-aligned.apk
+        $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks my-release-key.jks --ks-pass pass:password123 --key-pass pass:password123 --out app-release-signed.apk app-release-aligned.apk
         
         # Verify the signed APK
-        apksigner verify app-release-signed.apk
+        $ANDROID_HOME/build-tools/34.0.0/apksigner verify app-release-signed.apk
 
     - name: Upload signed APK
       uses: actions/upload-artifact@v4
